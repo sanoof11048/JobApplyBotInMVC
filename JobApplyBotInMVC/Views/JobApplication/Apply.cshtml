@@ -1,0 +1,51 @@
+﻿@model JobApplyBotInMVC.Models.JobApplicationRequest
+
+@{
+    ViewData["Title"] = "Send Job Application";
+}
+
+<h2>Send Job Application</h2>
+
+<form asp-action="Apply" method="post" enctype="multipart/form-data" class="form">
+    <div class="form-group mb-2">
+        <label asp-for="CompanyName">Company Name</label>
+        <input asp-for="CompanyName" class="form-control" placeholder="e.g. Vikn Codes" />
+    </div>
+    <div class="form-group mb-2">
+        <label asp-for="Contact">Email / WhatsApp</label>
+        <input asp-for="Contact" class="form-control" required />
+    </div>
+    <div class="form-group mb-2">
+        <label asp-for="Position">Job Position</label>
+        <select asp-for="Position" class="form-control" required>
+            <option value="fullstack">Fullstack</option>
+            <option value="backend">Backend</option>
+            <option value="frontend">Frontend</option>
+        </select>
+    </div>
+    <div class="form-group mb-2">
+        <label asp-for="Medium">Medium</label>
+        <select asp-for="Medium" class="form-control" required>
+            <option value="email">Email</option>
+            <option value="whatsapp">WhatsApp</option>
+        </select>
+    </div>
+    <div class="form-group mb-2">
+        <label asp-for="ResumeFile">Attach Resume (PDF)</label>
+        <input asp-for="ResumeFile" type="file" class="form-control" accept="application/pdf" />
+    </div>
+    <button type="submit" class="btn btn-primary mt-2">Send</button>
+</form>
+
+@if (ViewBag.Message != null)
+{
+    <div class="alert alert-info mt-3">@ViewBag.Message</div>
+}
+@if (ViewBag.WhatsAppLink != null)
+{
+    <div class="alert alert-success mt-3">
+        <a class="btn btn-success" href="@ViewBag.WhatsAppLink" target="_blank">
+            👉 Send WhatsApp Message
+        </a>
+    </div>
+}

@@ -1,0 +1,42 @@
+﻿@model IEnumerable<JobApplyBotInMVC.Models.JobApplicationRequest>
+
+@{
+    ViewData["Title"] = "Submitted Applications";
+}
+
+<h2>Submitted Applications</h2>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Company Name</th>
+            <th>Contact</th>
+            <th>Position</th>
+            <th>Medium</th>
+            <th>Resume</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var app in Model)
+        {
+            <tr>
+                <td>@app.Id</td>
+                <td>@app.CompanyName</td>
+                <td>@app.Contact</td>
+                <td>@app.Position</td>
+                <td>@app.Medium</td>
+                <td>
+                    @if (!string.IsNullOrWhiteSpace(app.ResumePath))
+                    {
+                        <a href="@app.ResumePath" target="_blank">View</a>
+                    }
+                    else
+                    {
+                        <span>N/A</span>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
