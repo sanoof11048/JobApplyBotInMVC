@@ -30,7 +30,7 @@ namespace JobApplyBotInMVC.Services
             };
 
             var mail = new MailMessage(fromEmail, request.Contact, subject, body);
-
+            mail.IsBodyHtml = true;
             bool attached = false;
 
             // Check if uploaded resume exists
@@ -62,23 +62,42 @@ namespace JobApplyBotInMVC.Services
         private string GenerateFullstackMessage(JobApplicationRequest request)
         {
             string company = string.IsNullOrWhiteSpace(request.CompanyName) ? "your organization" : request.CompanyName;
-            return $@"Dear Hiring Team at {company},
+            return $@"<p>Dear Hiring Team at <strong>{company}</strong>,</p>
 
-I hope this message finds you well.
+<p>I hope you are doing well.</p>
 
-I am writing to apply for the Full Stack Developer position at {company}. I have hands-on experience in developing scalable applications using .NET Core (C#) for backend and React with Tailwind CSS for frontend. I have successfully delivered production-grade applications like ADOTZEE and Plashoe.
+<p>
+I'm writing to express my interest in the <strong>Full Stack Developer</strong> role at <strong>{company}</strong>. I specialize in developing scalable and efficient web applications using <strong>.NET Core (C#)</strong> for the backend and <strong>React.js</strong> with <strong>Tailwind CSS</strong> for the frontend. My expertise spans API development, database design, clean UI/UX implementation, and performance optimization.
+</p>
 
-Please find my resume attached for your consideration. You may also visit my portfolio to review my work:  
-https://sanoof-portfolio.vercel.app
+<p>Here are some of the key projects I’ve worked on:</p>
+<ul>
+    <li><strong>ADOTZEE</strong> – An online admission assistance platform connecting students with colleges.</li>
+    <li><strong>Plashoe</strong> – A fully functional shoe e-commerce site with features like cart, wishlist, and order tracking.</li>
+    <li><strong>Mediconnect</strong> – A communication system for home nurses and patient relatives, with modules for vitals, food/medication logs, alerts, and chat.</li>
+    <li><strong>Carple</strong> (ongoing) – A driver booking and carpooling platform enabling real-time ride management and community-based travel coordination.</li>
+</ul>
 
-I would appreciate the opportunity to further discuss how my skills align with your team's goals.
+<p>I focus on writing clean, maintainable code and follow <strong>SOLID principles</strong> and modern architectural standards.</p>
 
-Thank you for your time and consideration.
+<p>
+Please find my resume attached for your consideration. You can also explore my portfolio here:<br>
+<a href='https://sanoof-portfolio.vercel.app'>https://sanoof-portfolio.vercel.app</a>
+</p>
 
-Kind regards,  
-Sanoof Mohammed  
-+91 7907805626";
+<p>I would welcome the opportunity to contribute to <strong>{company}</strong> and am available to join immediately.</p>
+
+<p>Thank you for your time and consideration.</p>
+
+<p>
+Best regards,<br>
+<strong>Sanoof Mohammed</strong><br>
+📞 +91 7907805626<br>
+✉️ sanoofmohammed.pvt@gmail.com
+</p>";
         }
+
+
 
         private string GenerateBackendMessage(JobApplicationRequest request)
         {
