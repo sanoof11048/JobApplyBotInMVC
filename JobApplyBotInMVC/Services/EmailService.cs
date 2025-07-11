@@ -14,13 +14,16 @@ namespace JobApplyBotInMVC.Services
             var port = int.Parse(Environment.GetEnvironmentVariable("EMAIL_PORT") ?? "587");
 
             string subject = $"Application for {request.Position} Developer Role";
-            string body = request.Position.ToLower() switch
+            string rawBody = request.Position.ToLower() switch
             {
                 "fullstack" => GenerateFullstackMessage(request),
                 "backend" => GenerateBackendMessage(request),
                 "frontend" => GenerateFrontendMessage(request),
                 _ => GenerateGenericMessage(request)
             };
+
+            string body = WrapInHtml(rawBody);
+
 
             var smtpClient = new SmtpClient(host)
             {
@@ -58,6 +61,27 @@ namespace JobApplyBotInMVC.Services
 
             await smtpClient.SendMailAsync(mail);
         }
+
+        private string WrapInHtml(string content)
+        {
+            return $@"<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='UTF-8'>
+    <style>
+        body {{
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            color: #333;
+        }}
+    </style>
+</head>
+<body>
+    {content}
+</body>
+</html>";
+        }
+
 
         private string GenerateFullstackMessage(JobApplicationRequest request)
         {
