@@ -102,59 +102,99 @@ Best regards,<br>
         private string GenerateBackendMessage(JobApplicationRequest request)
         {
             string company = string.IsNullOrWhiteSpace(request.CompanyName) ? "your company" : request.CompanyName;
-            return $@"Dear Hiring Team at {company},
 
-I am reaching out to express my interest in the Backend Developer (.NET) role at {company}. My core expertise includes building secure and scalable REST APIs using .NET Core, Entity Framework, ADO.NET, and SQL Server.
+            return $@"<p>Dear Hiring Team at <strong>{company}</strong>,</p>
 
-My previous work includes platforms such as ADOTZEE and MediConnect, where I focused on building clean, maintainable backend systems.
+<p>I hope you are doing well.</p>
 
-I have attached my resume for your review. My portfolio is available at:  
-https://sanoof-portfolio.vercel.app
+<p>
+I'm writing to apply for the <strong>Backend Developer (.NET)</strong> role at <strong>{company}</strong>. My expertise includes building secure and scalable REST APIs using <strong>.NET Core</strong>, <strong>Entity Framework</strong>, <strong>ADO.NET</strong>, and <strong>SQL Server</strong>.
+</p>
 
-I look forward to the opportunity to contribute to your backend team.
+<p>
+I follow best practices in architecture, clean code, and security, and am passionate about backend development and optimization.
+</p>
 
-Sincerely,  
-Sanoof Mohammed  
-+91 7907805626";
+<p>
+Please find my resume attached. You can also explore my portfolio here:<br>
+<a href='https://sanoof-portfolio.vercel.app'>https://sanoof-portfolio.vercel.app</a>
+</p>
+
+<p>I look forward to the opportunity to contribute to <strong>{company}</strong>.</p>
+
+<p>
+Sincerely,<br>
+<strong>Sanoof Mohammed</strong><br>
+📞 +91 7907805626<br>
+✉️ sanoofmohammed.pvt@gmail.com
+</p>";
         }
+
+
 
         private string GenerateFrontendMessage(JobApplicationRequest request)
         {
             string company = string.IsNullOrWhiteSpace(request.CompanyName) ? "your company" : request.CompanyName;
-            return $@"Dear Hiring Team at {company},
 
-I am writing to apply for the Frontend Developer position at {company}. I specialize in building responsive, accessible, and modern web applications using React, Tailwind CSS, and Redux Toolkit.
+            return $@"<p>Dear Hiring Team at <strong>{company}</strong>,</p>
 
-Projects like ADOTZEE and MediConnect showcase my ability to deliver highly polished frontend systems in real-world environments.
+<p>I hope this message finds you well.</p>
 
-Please find my resume attached and feel free to review my portfolio:  
-https://sanoof-portfolio.vercel.app
+<p>
+I'm excited to apply for the <strong>Frontend Developer</strong> role at <strong>{company}</strong>. I specialize in building modern, responsive, and accessible web applications using <strong>React.js</strong>, <strong>Tailwind CSS</strong>, and <strong>Redux Toolkit</strong>.
+</p>
 
-I am eager to bring my frontend expertise to your team.
+<p>
+My approach emphasizes clean UI/UX, performance optimization, and reusable component-driven architecture.
+</p>
 
-Best regards,  
-Sanoof Mohammed  
-+91 7907805626";
+<p>
+Please find my resume attached. You can also view my portfolio here:<br>
+<a href='https://sanoof-portfolio.vercel.app'>https://sanoof-portfolio.vercel.app</a>
+</p>
+
+<p>
+I would love the opportunity to contribute to <strong>{company}</strong>'s frontend development efforts.</p>
+
+<p>
+Best regards,<br>
+<strong>Sanoof Mohammed</strong><br>
+📞 +91 7907805626<br>
+✉️ sanoofmohammed.pvt@gmail.com
+</p>";
         }
 
         private string GenerateGenericMessage(JobApplicationRequest request)
         {
             string company = string.IsNullOrWhiteSpace(request.CompanyName) ? "your company" : request.CompanyName;
-            return $@"Dear Hiring Team at {company},
 
-I am reaching out to express my interest in the {request.Position} position.
+            return $@"<p>Dear Hiring Team at <strong>{company}</strong>,</p>
 
-Please find my resume attached. You can also visit my portfolio at:  
-https://sanoof-portfolio.vercel.app
+<p>
+I am writing to express my interest in the <strong>{request.Position}</strong> position.
+</p>
 
-I would be glad to discuss how my background can align with your requirements.
+<p>
+I am a passionate and results-driven software developer with a strong foundation in full-stack web development using modern technologies like <strong>.NET Core</strong>, <strong>React</strong>, and <strong>SQL</strong>. I follow clean code principles and continuously aim to deliver efficient and reliable software.
+</p>
 
-Thank you for your consideration.
+<p>
+Please find my resume attached. You can also visit my portfolio:<br>
+<a href='https://sanoof-portfolio.vercel.app'>https://sanoof-portfolio.vercel.app</a>
+</p>
 
-Warm regards,  
-Sanoof Mohammed  
-+91 7907805626";
+<p>
+Thank you for considering my application. I would be excited to discuss how I can contribute to <strong>{company}</strong>.
+</p>
+
+<p>
+Warm regards,<br>
+<strong>Sanoof Mohammed</strong><br>
+📞 +91 7907805626<br>
+✉️ sanoofmohammed.pvt@gmail.com
+</p>";
         }
+
 
     }
 }
