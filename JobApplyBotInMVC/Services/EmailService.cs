@@ -73,6 +73,15 @@ namespace JobApplyBotInMVC.Services
             font-family: Arial, sans-serif;
             font-size: 14px;
             color: #333;
+            line-height: 1.6;
+        }}
+        a {{
+            color: #333;
+            text-decoration: none;
+        }}
+        ul, li {{
+            color: #333;
+text-decoration: none;
         }}
     </style>
 </head>
@@ -81,6 +90,7 @@ namespace JobApplyBotInMVC.Services
 </body>
 </html>";
         }
+
 
 
         private string GenerateFullstackMessage(JobApplicationRequest request)
@@ -127,32 +137,33 @@ Best regards,<br>
         {
             string company = string.IsNullOrWhiteSpace(request.CompanyName) ? "your company" : request.CompanyName;
 
-            return $@"<p>Dear Hiring Team at <strong>{company}</strong>,</p>
+            return $@"<p style='color: #333;'>Dear Hiring Team at <strong style='color: #333;'>{company}</strong>,</p></br>
 
-<p>I hope you are doing well.</p>
+<p style='color: #333;'>I hope you are doing well.</p>
 
-<p>
-I'm writing to apply for the <strong>Backend Developer (.NET)</strong> role at <strong>{company}</strong>. My expertise includes building secure and scalable REST APIs using <strong>.NET Core</strong>, <strong>Entity Framework</strong>, <strong>ADO.NET</strong>, and <strong>SQL Server</strong>.
-</p>
+<p style='color: #333;'>
+I'm writing to apply for the <strong style='color: #333;'>Backend Developer (.NET)</strong> role at <strong style='color: #333;'>{company}</strong>. My expertise includes building secure and scalable REST APIs using <strong style='color: #333;'>.NET Core</strong>, <strong style='color: #333;'>Entity Framework</strong>, <strong style='color: #333;'>ADO.NET</strong>, and <strong style='color: #333;'>SQL Server</strong>.
+</p></br>
 
-<p>
+<p style='color: #333;'>
 I follow best practices in architecture, clean code, and security, and am passionate about backend development and optimization.
 </p>
 
-<p>
+<p style='color: #333;'>
 Please find my resume attached. You can also explore my portfolio here:<br>
-<a href='https://sanoof-portfolio.vercel.app'>https://sanoof-portfolio.vercel.app</a>
+<a href='https://sanoof-portfolio.vercel.app' style='color: #333;'>https://sanoof-portfolio.vercel.app</a>
 </p>
 
-<p>I look forward to the opportunity to contribute to <strong>{company}</strong>.</p>
+<p style='color: #333;'>I look forward to the opportunity to contribute to <strong style='color: #333;'>{company}</strong>.</p>
 
-<p>
+<p style='color: #333;'>
 Sincerely,<br>
-<strong>Sanoof Mohammed</strong><br>
+<strong style='color: #333;'>Sanoof Mohammed</strong><br>
 📞 +91 7907805626<br>
 ✉️ sanoofmohammed.pvt@gmail.com
 </p>";
         }
+
 
 
 
