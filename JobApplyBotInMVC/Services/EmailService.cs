@@ -24,19 +24,21 @@ namespace JobApplyBotInMVC.Services
 
             string body = WrapInHtml(rawBody);
 
-
-            var smtpClient = new SmtpClient(host)
+            using var smtpClient = new SmtpClient(host)
             {
                 Port = port,
                 Credentials = new NetworkCredential(fromEmail, fromPassword),
                 EnableSsl = true,
             };
 
-            var mail = new MailMessage(fromEmail, request.Contact, subject, body);
-            mail.IsBodyHtml = true;
+            var mail = new MailMessage(fromEmail, request.Contact, subject, body)
+            {
+                IsBodyHtml = true
+            };
+
             bool attached = false;
 
-            // Check if uploaded resume exists
+            // Attach user-uploaded resume if available
             if (!string.IsNullOrWhiteSpace(request.ResumePath))
             {
                 var fullPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", request.ResumePath.TrimStart('/'));
@@ -47,16 +49,34 @@ namespace JobApplyBotInMVC.Services
                 }
             }
 
-            // If no uploaded resume, fetch and attach from portfolio URL
+            // If no resume was attached, try to attach default from local wwwroot
             if (!attached)
             {
-                string defaultResumeUrl = "https://sanoof-portfolio.vercel.app/resume.pdf";
+                var localResumePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "resume.pdf");
 
-                using var httpClient = new HttpClient();
-                var resumeStream = await httpClient.GetStreamAsync(defaultResumeUrl);
-
-                var attachment = new Attachment(resumeStream, "resume.pdf", "application/pdf");
-                mail.Attachments.Add(attachment);
+                if (File.Exists(localResumePath))
+                {
+                    mail.Attachments.Add(new Attachment(localResumePath));
+                    attached = true;
+                }
+                else
+                {
+                    // Optional: Last-resort fallback to try downloading (but won't crash if fails)
+                    try
+                    {
+                        string defaultResumeUrl = "https://sanoof-portfolio.vercel.app/resume.pdf";
+                        using var httpClient = new HttpClient();
+                        var resumeStream = await httpClient.GetStreamAsync(defaultResumeUrl);
+                        var attachment = new Attachment(resumeStream, "resume.pdf", "application/pdf");
+                        mail.Attachments.Add(attachment);
+                        attached = true;
+                    }
+                    catch (Exception ex)
+                    {
+                        // Log error, but don't stop sending the email
+                        Console.WriteLine($"[EmailService] Could not attach default resume: {ex.Message}");
+                    }
+                }
             }
 
             await smtpClient.SendMailAsync(mail);
@@ -65,171 +85,156 @@ namespace JobApplyBotInMVC.Services
         private string WrapInHtml(string content)
         {
             return $@"<!DOCTYPE html>
-<html>
+<html lang='en'>
 <head>
     <meta charset='UTF-8'>
     <style>
         body {{
             font-family: Arial, sans-serif;
-            font-size: 14px;
+            font-size: 15px;
             color: #333;
             line-height: 1.6;
+            background-color: #f4f4f4;
+            padding: 20px;
         }}
+        .container {{
+            background: #fff;
+            padding: 20px 25px;
+            border-radius: 8px;
+            max-width: 650px;
+            margin: auto;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }}
+        p {{ margin: 8px 0; }}
         a {{
-            color: #333;
+            color: #007BFF;
             text-decoration: none;
         }}
-        ul, li {{
-            color: #333;
-text-decoration: none;
-        }}
+        a:hover {{ text-decoration: underline; }}
+        ul {{ padding-left: 20px; }}
     </style>
 </head>
 <body>
-    {content}
+    <div class='container'>
+        {content}
+    </div>
 </body>
 </html>";
         }
 
-
-
         private string GenerateFullstackMessage(JobApplicationRequest request)
         {
-            string company = string.IsNullOrWhiteSpace(request.CompanyName) ? "your organization" : request.CompanyName;
-            return $@"<p>Dear Hiring Team at <strong>{company}</strong>,</p>
+            string company = string.IsNullOrWhiteSpace(request.CompanyName)
+                ? "your organization"
+                : request.CompanyName;
 
-<p>I hope you are doing well.</p>
+            return $@"
+<p>Dear Hiring Team at <strong>{company}</strong>,</p>
 
-<p>
-I'm writing to express my interest in the <strong>Full Stack Developer</strong> role at <strong>{company}</strong>. I specialize in developing scalable and efficient web applications using <strong>.NET Core (C#)</strong> for the backend and <strong>React.js</strong> with <strong>Tailwind CSS</strong> for the frontend. My expertise spans API development, database design, clean UI/UX implementation, and performance optimization.
-</p>
+<p>I am excited to apply for the <strong>Full Stack Developer</strong> role at <strong>{company}</strong>. 
+I build scalable, high-quality applications using <strong>.NET Core</strong> (backend) and <strong>React.js</strong> (frontend), ensuring both performance and user experience excellence.</p>
 
-<p>Here are some of the key projects I’ve worked on:</p>
+<p><strong>Key Skills:</strong> .NET Core, C#, React.js, Tailwind CSS, Entity Framework, SQL Server, REST API Development, Dapper, Git/GitHub, CI/CD, Render, Cloud Deployment, JWT Authentication.</p>
+
+<p>Selected Projects:</p>
 <ul>
-    <li><strong>ADOTZEE</strong> – An online admission assistance platform connecting students with colleges.</li>
-    <li><strong>Plashoe</strong> – A fully functional shoe e-commerce site with features like cart, wishlist, and order tracking.</li>
-    <li><strong>Mediconnect</strong> – A communication system for home nurses and patient relatives, with modules for vitals, food/medication logs, alerts, and chat.</li>
-    <li><strong>Carple</strong> (ongoing) – A driver booking and carpooling platform enabling real-time ride management and community-based travel coordination.</li>
+    <li>ADOTZEE – Admission assistance platform</li>
+    <li>Plashoe – Complete E-commerce project</li>
+    <li>MediConnect – Healthcare communication platform</li>
+    <li>Carple (ongoing) – Real-time driver booking & carpooling system</li>
 </ul>
 
-<p>I focus on writing clean, maintainable code and follow <strong>SOLID principles</strong> and modern architectural standards.</p>
+<p>Portfolio: <a href='https://sanoof-portfolio.vercel.app'>https://sanoof-portfolio.vercel.app</a></p>
 
-<p>
-Please find my resume attached for your consideration. You can also explore my portfolio here:<br>
-<a href='https://sanoof-portfolio.vercel.app'>https://sanoof-portfolio.vercel.app</a>
-</p>
+<p>I’d be happy to discuss how I can contribute to <strong>{company}</strong>’s development goals.</p>
 
-<p>I would welcome the opportunity to contribute to <strong>{company}</strong> and am available to join immediately.</p>
-
-<p>Thank you for your time and consideration.</p>
-
-<p>
-Best regards,<br>
+<p>Best regards,<br>
 <strong>Sanoof Mohammed</strong><br>
-📞 +91 7907805626<br>
-✉️ sanoofmohammed.pvt@gmail.com
-</p>";
+📞 +91 7907805626<br>";
         }
-
-
 
         private string GenerateBackendMessage(JobApplicationRequest request)
         {
-            string company = string.IsNullOrWhiteSpace(request.CompanyName) ? "your company" : request.CompanyName;
+            string company = string.IsNullOrWhiteSpace(request.CompanyName)
+                ? "your esteemed organization"
+                : request.CompanyName;
 
-            return $@"<p style='color: #333;'>Dear Hiring Team at <strong style='color: #333;'>{company}</strong>,</p></br>
+            return $@"
+<p>Dear Hiring Team at <strong>{company}</strong>,</p>
 
-<p style='color: #333;'>I hope you are doing well.</p>
+<p>I’m applying for the <strong>Backend Developer (.NET)</strong> position at <strong>{company}</strong>. 
+I specialize in building secure, high-performance REST APIs using <strong>.NET Core</strong>, <strong>Entity Framework</strong>, <strong>SQL Server</strong>, <strong>Dapper</strong>, and <strong>Cloud Hosting</strong>.</p>
 
-<p style='color: #333;'>
-I'm writing to apply for the <strong style='color: #333;'>Backend Developer (.NET)</strong> role at <strong style='color: #333;'>{company}</strong>. My expertise includes building secure and scalable REST APIs using <strong style='color: #333;'>.NET Core</strong>, <strong style='color: #333;'>Entity Framework</strong>, <strong style='color: #333;'>ADO.NET</strong>, and <strong style='color: #333;'>SQL Server</strong>.
-</p></br>
+<p><strong>Key Skills:</strong> API Design, Database Optimization, ADO.NET, Render, JWT Authentication, Git/GitHub, Docker Basics.</p>
 
-<p style='color: #333;'>
-I follow best practices in architecture, clean code, and security, and am passionate about backend development and optimization.
-</p>
+<p>Key Highlights:</p>
+<ul>
+    <li>Optimized backend performance for large-scale systems</li>
+    <li>Developed scalable, secure APIs for production use</li>
+    <li>Maintained clean, modular architecture</li>
+</ul>
 
-<p style='color: #333;'>
-Please find my resume attached. You can also explore my portfolio here:<br>
-<a href='https://sanoof-portfolio.vercel.app' style='color: #333;'>https://sanoof-portfolio.vercel.app</a>
-</p>
+<p>Portfolio: <a href='https://sanoof-portfolio.vercel.app'>https://sanoof-portfolio.vercel.app</a></p>
 
-<p style='color: #333;'>I look forward to the opportunity to contribute to <strong style='color: #333;'>{company}</strong>.</p>
+<p>I look forward to contributing to <strong>{company}</strong>’s backend excellence.</p>
 
-<p style='color: #333;'>
-Sincerely,<br>
-<strong style='color: #333;'>Sanoof Mohammed</strong><br>
-📞 +91 7907805626<br>
-✉️ sanoofmohammed.pvt@gmail.com
-</p>";
+<p>Best regards,<br>
+<strong>Sanoof Mohammed</strong><br>
+📞 +91 7907805626<br>";
         }
-
-
-
 
         private string GenerateFrontendMessage(JobApplicationRequest request)
         {
-            string company = string.IsNullOrWhiteSpace(request.CompanyName) ? "your company" : request.CompanyName;
+            string company = string.IsNullOrWhiteSpace(request.CompanyName)
+                ? "your organization"
+                : request.CompanyName;
 
-            return $@"<p>Dear Hiring Team at <strong>{company}</strong>,</p>
+            return $@"
+<p>Dear Hiring Team at <strong>{company}</strong>,</p>
 
-<p>I hope this message finds you well.</p>
+<p>I’m excited to apply for the <strong>Frontend Developer</strong> position at <strong>{company}</strong>. 
+I create responsive, accessible, and visually engaging UIs using <strong>React</strong>, <strong>Tailwind CSS</strong>, and <strong>Redux Toolkit</strong>.</p>
 
-<p>
-I'm excited to apply for the <strong>Frontend Developer</strong> role at <strong>{company}</strong>. I specialize in building modern, responsive, and accessible web applications using <strong>React.js</strong>, <strong>Tailwind CSS</strong>, and <strong>Redux Toolkit</strong>.
-</p>
+<p><strong>Key Skills:</strong> JavaScript (ES6+), React, TypeScript, Redux Toolkit, Tailwind CSS, API Integration, Responsive Design, Git/GitHub, Figma to Code, Performance Optimization, Accessibility (WCAG).</p>
 
-<p>
-My approach emphasizes clean UI/UX, performance optimization, and reusable component-driven architecture.
-</p>
+<p>Highlighted Work:</p>
+<ul>
+    <li>Reusable, modular UI components</li>
+    <li>Pixel-perfect, mobile-first designs</li>
+    <li>High-performance, SEO-friendly pages</li>
+</ul>
 
-<p>
-Please find my resume attached. You can also view my portfolio here:<br>
-<a href='https://sanoof-portfolio.vercel.app'>https://sanoof-portfolio.vercel.app</a>
-</p>
+<p>Portfolio: <a href='https://sanoof-portfolio.vercel.app'>https://sanoof-portfolio.vercel.app</a></p>
 
-<p>
-I would love the opportunity to contribute to <strong>{company}</strong>'s frontend development efforts.</p>
+<p>I’d love to bring my frontend expertise to <strong>{company}</strong>.</p>
 
-<p>
-Best regards,<br>
+<p>Best regards,<br>
 <strong>Sanoof Mohammed</strong><br>
-📞 +91 7907805626<br>
-✉️ sanoofmohammed.pvt@gmail.com
-</p>";
+📞 +91 7907805626<br>";
         }
 
         private string GenerateGenericMessage(JobApplicationRequest request)
         {
-            string company = string.IsNullOrWhiteSpace(request.CompanyName) ? "your company" : request.CompanyName;
+            string company = string.IsNullOrWhiteSpace(request.CompanyName)
+                ? "your organization"
+                : request.CompanyName;
 
-            return $@"<p>Dear Hiring Team at <strong>{company}</strong>,</p>
+            return $@"
+<p>Dear Hiring Team at <strong>{company}</strong>,</p>
 
-<p>
-I am writing to express my interest in the <strong>{request.Position}</strong> position.
-</p>
+<p>I’m applying for the <strong>{request.Position}</strong> position at <strong>{company}</strong>. 
+I’m a results-driven developer skilled in <strong>.NET Core</strong>, <strong>React</strong>, and <strong>SQL Server</strong>, 
+focused on delivering efficient and reliable solutions.</p>
 
-<p>
-I am a passionate and results-driven software developer with a strong foundation in full-stack web development using modern technologies like <strong>.NET Core</strong>, <strong>React</strong>, and <strong>SQL</strong>. I follow clean code principles and continuously aim to deliver efficient and reliable software.
-</p>
+<p><strong>Core Skills:</strong> .NET Core, C#, React.js, Tailwind CSS, SQL Server, REST APIs, Git/GitHub, Entity Framework, Dapper, Cloud Hosting, JWT Authentication.</p>
 
-<p>
-Please find my resume attached. You can also visit my portfolio:<br>
-<a href='https://sanoof-portfolio.vercel.app'>https://sanoof-portfolio.vercel.app</a>
-</p>
+<p>Portfolio: <a href='https://sanoof-portfolio.vercel.app'>https://sanoof-portfolio.vercel.app</a></p>
 
-<p>
-Thank you for considering my application. I would be excited to discuss how I can contribute to <strong>{company}</strong>.
-</p>
+<p>I’d be happy to discuss how my skills can support <strong>{company}</strong>’s projects.</p>
 
-<p>
-Warm regards,<br>
+<p>Best regards,<br>
 <strong>Sanoof Mohammed</strong><br>
-📞 +91 7907805626<br>
-✉️ sanoofmohammed.pvt@gmail.com
-</p>";
+📞 +91 7907805626<br>";
         }
-
-
     }
 }
